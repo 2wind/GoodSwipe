@@ -1,6 +1,4 @@
-const scale = 50;
-const trigger = 25;
-const timeoutTime = 150;
+
 
 let counter = 0;
 let amount = 0;
@@ -60,7 +58,11 @@ function reset() {
 function update() {
     const direction = Math.sign(counter);
     const progression = amount / trigger;
+    // progression: if progression >= 1 then move page.
+    // stop direction.
+
     
+
     if (progression === 0) {
         leftIndicator.style.left = "0%";
         leftIndicator.style.boxShadow = "0 0 0 0rem rgba(10, 132, 255, 0.5)";
@@ -69,18 +71,20 @@ function update() {
         rightIndicator.style.boxShadow = "0 0 0 0rem rgba(10, 132, 255, 0.5)";
         rightIndicator.style.transition = "right 0.1s ease-in, box-shadow 0.1s ease-in";
     } else {
+        
+        const accentColor = progression >= 1 ? `rgba(0, 60, 255, ${0.25 + 0.5 * Math.pow(progression, 2)})` : `rgba(10, 132, 255, ${0.25 + 0.5 * Math.pow(progression, 2)})`;
         switch (direction) {
             case -1:
-                leftIndicator.style.boxShadow = `0 0 0 ${progression}rem rgba(10, 132, 255, ${0.25 + 0.5 * Math.pow(progression, 2)})`;
-                leftIndicator.style.left = `${10 * progression}%`;
+                leftIndicator.style.boxShadow = `0 0 0 1rem ${accentColor}`;
+                leftIndicator.style.left = `${navigationIndicatorToScreenPercentage * progression}%`;
                 leftIndicator.style.transition = "none";
                 rightIndicator.style.boxShadow = "0 0 0 0rem rgba(10, 132, 255, 0.5)";
                 rightIndicator.style.right = "0%";
                 rightIndicator.style.transition = "right 0.1s ease-in, box-shadow 0.1s ease-in";
                 break;
             case 1:
-                rightIndicator.style.boxShadow = `0 0 0 ${progression}rem rgba(10, 132, 255, ${0.25 + 0.5 * Math.pow(progression, 2)})`;
-                rightIndicator.style.right = `${10 * progression}%`;
+                rightIndicator.style.boxShadow = `0 0 0 1rem ${accentColor}`;
+                rightIndicator.style.right = `${navigationIndicatorToScreenPercentage * progression}%`;
                 rightIndicator.style.transition = "none";
                 leftIndicator.style.boxShadow = "0 0 0 0rem rgba(10, 132, 255, 0.5)";
                 leftIndicator.style.left = "0%";
@@ -91,7 +95,16 @@ function update() {
     }
 }
 
-function compute(count) {
+function computeWheel(count){
+    compute(count * wheelScrollMultiplier, true);
+
+}
+
+function computeTouch(count){
+    compute(count * touchScrollMultiplier, isTimeOutEnabled);
+}
+
+function compute(count, isTimeOut) {
     if (
         count === 0 || (
             window.pageXOffset > 0 &&
@@ -102,7 +115,8 @@ function compute(count) {
         return;
     }
 
-    if (timeout !== null) {
+
+    if (isTimeOut && timeout !== null) {
         clearTimeout(timeout);
         timeout = null;
     }
@@ -113,7 +127,7 @@ function compute(count) {
 
     update();
 
-    if (amount > trigger) {
+    if (isTimeOut && (amount > trigger)) {
         if (counter > 0) {
             window.history.forward();
         }
@@ -122,12 +136,14 @@ function compute(count) {
         }
     }
     
-    timeout = setTimeout(reset, timeoutTime);
+    if (isTimeOut){
+        timeout = setTimeout(reset, timeoutTime);
+    }
 }
 
 init();
 document.addEventListener("wheel", (event) => {
-    compute(event.deltaX);
+    computeWheel(event.deltaX);
 });
 
 document.addEventListener("touchstart", (event) => {
@@ -137,11 +153,31 @@ document.addEventListener("touchstart", (event) => {
 document.addEventListener("touchmove", (event) => {
     const touch = event.touches[0];
 
-    if (Math.abs((touch.clientY - lastTouch.clientY) / (touch.clientX - lastTouch.clientX)) < 0.5) {
+    if ( 
+        Math.abs((touch.clientY - lastTouch.clientY) / (touch.clientX - lastTouch.clientX)) < 0.5
+        ) {
         const count = lastTouch.clientX - touch.clientX;
-        compute(count * 0.1);
+        computeTouch(count);
     }
 
     lastTouch = event.touches[0];
 });
 
+function touchFinishedNavigation(event){
+    // TODO: navigate forward/backward / refresh / scroll to top when touchend happens.
+
+    if (amount > trigger) {
+        if (counter > 0) {
+            window.history.forward();
+        }
+        else {
+            window.history.back();
+        }
+    }
+    
+    reset();
+}
+
+document.addEventListener("touchend", touchFinishedNavigation);
+
+document.addEventListener("touchcancel", touchFinishedNavigation);
