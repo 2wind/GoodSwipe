@@ -153,7 +153,7 @@ document.addEventListener("touchstart", (event) => {
 document.addEventListener("touchmove", (event) => {
     const touch = event.touches[0];
 
-    if ( 
+    if ( event.touches.length === 1 && 
         Math.abs((touch.clientY - lastTouch.clientY) / (touch.clientX - lastTouch.clientX)) < 0.5
         ) {
         const count = lastTouch.clientX - touch.clientX;
@@ -165,8 +165,9 @@ document.addEventListener("touchmove", (event) => {
 
 function touchFinishedNavigation(event){
     // TODO: navigate forward/backward / refresh / scroll to top when touchend happens.
+    
 
-    if (amount > trigger) {
+    if (event.touches.length === 1 && amount > trigger) {
         if (counter > 0) {
             window.history.forward();
         }
