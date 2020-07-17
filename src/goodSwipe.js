@@ -87,6 +87,7 @@ function touchFinishedNavigation(event){
     if (amount > trigger){
         navigate();
     }
+
     reset();
 }
 
