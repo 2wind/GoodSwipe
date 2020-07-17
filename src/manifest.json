@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Good Swipes Custom Edition",
-    "version": "1.0.1",
+    "version": "1.0.2",
 
     "description": "Implementation of touchpad and touchscreen gesture to go back and forward, with feedback, inspired by the same built in function on Google Chrome.",
 
@@ -17,7 +17,7 @@
     "content_scripts": [
         {
             "matches": ["*://*/*"],
-            "js": ["goodSwipe.js", "setting.js"],
+            "js": ["goodSwipe.js"],
             "css": ["goodSwipe.css"]
         }
     ],
