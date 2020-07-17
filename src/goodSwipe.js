@@ -83,6 +83,13 @@ function isScrollingY() {
     );
 }
 
+function touchFinishedNavigation(event){
+    if (amount > trigger){
+        navigate();
+    }
+    reset();
+}
+
 function navigate() {
     if (counter > 0) {
         window.history.forward();
