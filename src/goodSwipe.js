@@ -48,6 +48,41 @@ function getBodyWidth() {
     );
 }
 
+function getBodyHeight() {
+    return Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.documentElement.clientHeight
+    );
+}
+
+function isScrollingX() {
+    return (
+        window.pageXOffset > 0 &&
+        window.pageXOffset + window.innerWidth < getBodyWidth()
+    );
+}
+
+function isScrollingY() {
+    return (
+        window.pageYOffset > 0 &&
+        window.pageYOffset + window.innerHeight < getBodyHeight()
+    );
+}
+
+function navigate() {
+    if (counter > 0) {
+        window.history.forward();
+    }
+    else {
+        window.history.back();
+    }
+    willNavigate = true;
+}
+
+
 function reset() {
     amount = 0;
     counter = 0;
@@ -106,10 +141,7 @@ function computeTouch(count){
 
 function compute(count, isTimeOut) {
     if (
-        count === 0 || (
-            window.pageXOffset > 0 &&
-            window.pageXOffset + window.innerWidth < getBodyWidth()
-        ) ||
+        count === 0 || isScrollingX() ||
         willNavigate
     ) {
         return;
@@ -128,12 +160,7 @@ function compute(count, isTimeOut) {
     update();
 
     if (isTimeOut && (amount > trigger)) {
-        if (counter > 0) {
-            window.history.forward();
-        }
-        else {
-            window.history.back();
-        }
+        navigate();
     }
     
     if (isTimeOut){
@@ -142,6 +169,7 @@ function compute(count, isTimeOut) {
 }
 
 init();
+
 document.addEventListener("wheel", (event) => {
     computeWheel(event.deltaX);
 });
@@ -163,21 +191,9 @@ document.addEventListener("touchmove", (event) => {
     lastTouch = event.touches[0];
 });
 
-function touchFinishedNavigation(event){
-    // TODO: navigate forward/backward / refresh / scroll to top when touchend happens.
     
 
-    if (amount > trigger) {
-        if (counter > 0) {
-            window.history.forward();
-        }
-        else {
-            window.history.back();
-        }
-    }
     
-    reset();
-}
 
 document.addEventListener("touchend", touchFinishedNavigation);
 
