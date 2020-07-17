@@ -87,6 +87,7 @@ function reset() {
     amount = 0;
     counter = 0;
     timeout = null;
+    willNavigate = false;
     update();
 }
 
@@ -182,8 +183,10 @@ document.addEventListener("touchmove", (event) => {
     const touch = event.touches[0];
 
     if ( event.touches.length === 1 && 
-        Math.abs((touch.clientY - lastTouch.clientY) / (touch.clientX - lastTouch.clientX)) < 0.5
+        Math.abs((touch.clientY - lastTouch.clientY) / (touch.clientX - lastTouch.clientX)) < 0.5 &&
+        !isScrollingX()
         ) {
+        event.preventDefault();
         const count = lastTouch.clientX - touch.clientX;
         computeTouch(count);
     }
@@ -191,9 +194,9 @@ document.addEventListener("touchmove", (event) => {
     lastTouch = event.touches[0];
 });
 
-    
 
-    
+
+
 
 document.addEventListener("touchend", touchFinishedNavigation);
 
