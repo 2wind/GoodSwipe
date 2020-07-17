@@ -72,7 +72,7 @@ function update() {
         rightIndicator.style.transition = "right 0.1s ease-in, box-shadow 0.1s ease-in";
     } else {
         
-        const accentColor = progression >= 1 ? `rgba(0, 60, 255, ${0.25 + 0.5 * Math.pow(progression, 2)})` : `rgba(10, 132, 255, ${0.25 + 0.5 * Math.pow(progression, 2)})`;
+        const accentColor = progression >= 1 ? `rgba(0, 60, 255, 1)` : `rgba(10, 132, 255, 1)`;
         switch (direction) {
             case -1:
                 leftIndicator.style.boxShadow = `0 0 0 1rem ${accentColor}`;
@@ -167,7 +167,7 @@ function touchFinishedNavigation(event){
     // TODO: navigate forward/backward / refresh / scroll to top when touchend happens.
     
 
-    if (event.touches.length === 1 && amount > trigger) {
+    if (amount > trigger) {
         if (counter > 0) {
             window.history.forward();
         }
